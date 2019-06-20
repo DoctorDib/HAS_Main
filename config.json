@@ -1,0 +1,12 @@
+{
+    "owner": "james",
+    "max_owner_tick": 5,
+    "master_server": "192.168.0.10",
+    "active_rooms": {
+        "bedroom": false,
+        "study": false,
+        "lounge": false
+    },
+    "heartbeat_interval": 5,
+    "maxTickError": 10
+}

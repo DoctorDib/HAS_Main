@@ -1,0 +1,97 @@
+<html style="overflow-x: hidden;">
+    <head>
+        <title>Test</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            ::-webkit-scrollbar {
+                width: 0.3em;
+                height: 0.3em;
+                background-color: rgba(0,0,0,0)
+            }
+            ::-webkit-scrollbar-track {
+                -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+            }
+            ::-webkit-scrollbar-thumb {
+                background-color: #787878;
+                outline: 1px solid #c1c1c1;
+            }
+            body {
+                background: #f3f1f1 url("https://www.transparenttextures.com/patterns/brilliant.png");
+            }
+        </style>
+    </head>
+    <body ondragstart="return false;" ondrop="return false;" style="padding: 1em; margin: 0; overflow: hidden">
+        <section id="importContent"></section>
+
+        <Button onClick="activate()"> Activate system </Button>
+
+        <H1> System active <div id="system"> </div></H1>
+
+        <H1> Active pis </H1>
+        <table>
+            <tr id="activeRooms">
+                <th>Room</th>
+                <th>Active</th>
+            </tr>
+            <tr>
+                <td>Bedroom</td>
+                <td id="bedroom"></td>
+            </tr>
+            <tr>
+                <td>Study</td>
+                <td id="study"></td>
+            </tr>
+            <tr>
+                <td>Lounge</td>
+                <td id="lounge"></td>
+            </tr>
+        </table>
+    </body>
+</html>
+
+<script>
+    const url = 'ws://192.168.0.10:8081/';
+    const connection = new WebSocket(url,"echo-protocol");
+
+    connection.onopen = e => {
+        connection.send("initial")
+        //activate();
+    }
+
+    function activate () {
+        let already = document.getElementById("system").textContent === "true" ? "false" : "true";
+
+        document.getElementById("system").textContent = already;
+        document.getElementById("system").style.color = already === "true" ? "green" : "red";
+
+        connection.send(JSON.stringify(already))
+    }
+
+    // One time
+
+
+    connection.onmessage = e => {
+        let data = JSON.parse(e.data);
+
+        if (data.hasOwnProperty("id")){
+            //.activeRooms;
+            if (data.id === "initial") {
+                console.log(data.system)
+                document.getElementById("system").textContent = data.system;
+                document.getElementById("system").style.color = data.system === "true" ? "green" : "red";
+            }
+        } else {
+            for (let room in data) {
+                if (data.hasOwnProperty(room)){
+                    let active = data[room];
+
+                    let colour = active ? "green" : "red";
+                    document.getElementById(room).textContent = data[room];
+                    document.getElementById(room).style.color = colour;
+                }
+            }
+        }
+    }
+</script>
